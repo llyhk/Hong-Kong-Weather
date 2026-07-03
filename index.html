@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會所大廳 - 天氣警告顯示</title>
+    <style>
+        /* 基本頁面設定，背景設為透明/深色，適合電子屏顯示 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* 深灰色背景，若要透明可改為 transparent */
+            color: white;
+            font-family: "Microsoft JhengHei", "PingFang HK", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 警告圖示的容器排版 */
+        #warning-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 圖片大小設定 */
+        .warning-img {
+            height: 150px; /* 圖示高度，可根據你們的螢幕大小自行調整 */
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* 如果圖片遺失，顯示的備用文字方塊 */
+        .fallback-box {
+            background-color: #ff3b30;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            border: 2px solid white;
+        }
+
+        /* 沒有警告時的文字樣式 */
+        .no-warning {
+            font-size: 28px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="warning-container">
+        <div class="no-warning">正在載入天氣資訊...</div>
+    </div>
+
+    <script>
+        // 天氣警告代碼對應表 (天文台官方代碼)
+        // 這些代碼將作為你圖片的檔名
+        const codeMap = {
+            "WFIREY": "黃色火災危險",
+            "WFIRER": "紅色火災危險",
+            "WFROST": "霜凍警告",
+            "WHOT": "酷熱天氣",
+            "WCOLD": "寒冷天氣",
+            "WMSGNL": "強烈季候風",
+            "WRAINB": "黑色暴雨",
+            "WRAINA": "黃色暴雨",
+            "WRAINR": "紅色暴雨",
+            "WTS": "雷暴警告",
+            "WTCSGNL_1": "一號戒備信號",
+            "WTCSGNL_3": "三號強風信號",
+            "WTCSGNL_8NE": "八號東北烈風",
+            "WTCSGNL_8NW": "八號西北烈風",
+            "WTCSGNL_8SE": "八號東南烈風",
+            "WTCSGNL_8SW": "八號西南烈風",
+            "WTCSGNL_9": "九號烈風信號",
+            "WTCSGNL_10": "十號颶風信號",
+            "WL": "山泥傾瀉警告",
+            "WNTFL": "新界北部水浸"
+        };
+
+        async function fetchWarnings() {
+            try {
+                // 讀取香港天文台開放數據 API (天氣警告摘要)
+                const response = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc');
+                const data = await response.json();
+                const container = document.getElementById('warning-container');
+                container.innerHTML = ''; // 清空內容
+
+                const activeWarnings = Object.keys(data);
+                
+                // 如果目前沒有任何警告
+                if (activeWarnings.length === 0) {
+                     container.innerHTML = '<div class="no-warning">目前沒有生效的天氣警告</div>';
+                     return;
+                }
+
+                // 根據生效的警告生成對應的圖片
+                activeWarnings.forEach(code => {
+                     const warningName = data[code].name;
+                     // 假設圖片放在一個名為 "icons" 的資料夾中，檔名就是代碼 (例如 WTS.png)
+                     // onerror 是一道保險：如果你少存了一張圖片，系統會自動變成顯示文字方塊，不會破圖
+                     const iconHtml = `
+                        <img class="warning-img" 
+                             src="icons/${code}.png" 
+                             alt="${warningName}" 
+                             onerror="this.onerror=null; this.outerHTML='<div class=\\'fallback-box\\'>${warningName}</div>';">
+                     `;
+                     container.innerHTML += iconHtml;
+                });
+
+            } catch (error) {
+                console.error('讀取天氣警告失敗:', error);
+                document.getElementById('warning-container').innerHTML = '<div class="fallback-box">無法連線至香港天文台</div>';
+            }
+        }
+
+        // 網頁開啟時立刻執行一次
+        fetchWarnings();
+        
+        // 設定每 5 分鐘 (300000 毫秒) 自動重新載入一次最新資訊
+        setInterval(fetchWarnings, 300000);
+    </script>
+</body>
+</html>
