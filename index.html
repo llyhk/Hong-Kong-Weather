@@ -9,48 +9,33 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: transparent; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
+            background-color: #e8e4db;
+            background-color: #1a1a1a
             overflow: hidden;
         }
 
         /* 警告圖示的容器排版 */
         #warning-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        #warning-container {
-            display: flex;
-            flex-wrap: wrap;       /* 空間不夠時自動換行 */
-            justify-content: center; /* 水平置中 */
-            align-content: center;   /* 垂直置中（不管是一排還是兩排，都會乖乖待在框框正中間）*/
+            flex-direction: row;     /* 橫向排隊 */
+            justify-content: flex-end; /* 【關鍵修改】全部圖示往右邊靠攏 */
+            align-items: center;     /* 垂直置中 */
             width: 100%;
             height: 100%;
-            gap: 10px;             /* 圖示之間的呼吸空間 */
-            padding: 10px;
+            gap: 15px;               /* 每個圖示之間的距離，可依喜好微調 */
+            padding: 10px;           /* 邊界保留一點呼吸空間 */
             box-sizing: border-box;
         }
 
-        /* 預設圖示樣式 (針對 2 個以上的警告) */
+        /* 統一的圖示大小 */
         .warning-img {
-            /* 最大不超過框框的 45%，這樣無論如何都能排成 2x2 的田字型，絕對不會超出框外 */
-            max-width: 45%;  
-            max-height: 45%; 
-            object-fit: contain; /* 確保圖示比例正常，不被壓扁 */
-        }
-
-        /* 特殊樣式：如果目前只有 1 個警告，允許它放大到 90% */
-        .warning-img.single-warning {
-            max-width: 90%;
-            max-height: 90%;
+            height: 90%;             /* 高度固定為框框的 90% */
+            max-height: 160px;       /* 設定一個最大高度，避免在大螢幕上大得太誇張 */
+            width: auto;             /* 寬度按比例自動調整 */
+            object-fit: contain;     /* 確保圖示不變形 */
+            flex-shrink: 0;          /* 【保險機制】空間不夠時，寧願超出畫面也不准把圖示壓扁 */
         }
 
         /* 如果圖片遺失，顯示的備用文字方塊 */
@@ -131,7 +116,7 @@
 
             } catch (error) {
                 console.error('讀取天氣警告失敗:', error);
-                document.getElementById('warning-container').innerHTML = '<div class="fallback-box">連線天文台失敗</div>';
+                document.getElementById('warning-container').innerHTML = '<div class="fallback-box">無法連線至香港天文台</div>';
             }
         }
 
