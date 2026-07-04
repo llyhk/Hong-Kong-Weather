@@ -27,11 +27,30 @@
             padding: 20px;
         }
 
-        /* 圖片大小設定 */
+        #warning-container {
+            display: flex;
+            flex-wrap: wrap;       /* 空間不夠時自動換行 */
+            justify-content: center; /* 水平置中 */
+            align-content: center;   /* 垂直置中（不管是一排還是兩排，都會乖乖待在框框正中間）*/
+            width: 100%;
+            height: 100%;
+            gap: 10px;             /* 圖示之間的呼吸空間 */
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* 預設圖示樣式 (針對 2 個以上的警告) */
         .warning-img {
-            height: 180px; /* 圖示高度，可根據螢幕大小自行調整 */
-            width: auto;
-            object-fit: contain;
+            /* 最大不超過框框的 45%，這樣無論如何都能排成 2x2 的田字型，絕對不會超出框外 */
+            max-width: 45%;  
+            max-height: 45%; 
+            object-fit: contain; /* 確保圖示比例正常，不被壓扁 */
+        }
+
+        /* 特殊樣式：如果目前只有 1 個警告，允許它放大到 90% */
+        .warning-img.single-warning {
+            max-width: 90%;
+            max-height: 90%;
         }
 
         /* 如果圖片遺失，顯示的備用文字方塊 */
