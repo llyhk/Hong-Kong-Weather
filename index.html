@@ -9,9 +9,7 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #1a1a1a; /* 深灰色背景，若要透明可改為 transparent */
-            color: white;
-            font-family: "Microsoft JhengHei", "PingFang HK", sans-serif;
+            background-color: transparent; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -31,34 +29,31 @@
 
         /* 圖片大小設定 */
         .warning-img {
-            height: 150px; /* 圖示高度，可根據你們的螢幕大小自行調整 */
+            height: 180px; /* 圖示高度，可根據螢幕大小自行調整 */
             width: auto;
             object-fit: contain;
         }
 
         /* 如果圖片遺失，顯示的備用文字方塊 */
         .fallback-box {
-            background-color: #ff3b30;
+            background-color: #ff0000;
             color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-size: 24px;
+            padding: 10px;
+            font-size: 20px;
             font-weight: bold;
             text-align: center;
-            border: 2px solid white;
+            font-family: "Microsoft JhengHei", "PingFang HK", sans-serif;
         }
 
         /* 沒有警告時的文字樣式 */
         .no-warning {
-            font-size: 28px;
-            color: #888;
+            display: none;
         }
     </style>
 </head>
 <body>
 
     <div id="warning-container">
-        <div class="no-warning">正在載入天氣資訊...</div>
     </div>
 
     <script>
@@ -97,36 +92,34 @@
 
                 const activeWarnings = Object.keys(data);
                 
-                // 如果目前沒有任何警告
+                // 如果目前沒有任何警告，網頁顯示空白
                 if (activeWarnings.length === 0) {
-                     container.innerHTML = '<div class="no-warning">目前沒有生效的天氣警告</div>';
                      return;
                 }
 
                 // 根據生效的警告生成對應的圖片
                 activeWarnings.forEach(code => {
                      const warningName = data[code].name;
-                     // 假設圖片放在一個名為 "icons" 的資料夾中，檔名就是代碼 (例如 WTS.png)
-                     // onerror 是一道保險：如果你少存了一張圖片，系統會自動變成顯示文字方塊，不會破圖
+                     // 假設圖片放在一個名為 "icon" 的資料夾中，檔名就是代碼 (例如 WMSGNL.png)
                      const iconHtml = `
                         <img class="warning-img" 
-                             src="icons/${code}.png" 
+                             src="icon/${code}.png" 
                              alt="${warningName}" 
-                             onerror="this.onerror=null; this.outerHTML='<div class=\\'fallback-box\\'>${warningName}</div>';">
+                             onerror="this.onerror=null; this.outerHTML='<div class=\\'fallback-box\\'>(圖片遺失: ${warningName})</div>';">
                      `;
                      container.innerHTML += iconHtml;
                 });
 
             } catch (error) {
                 console.error('讀取天氣警告失敗:', error);
-                document.getElementById('warning-container').innerHTML = '<div class="fallback-box">無法連線至香港天文台</div>';
+                document.getElementById('warning-container').innerHTML = '<div class="fallback-box">連線天文台失敗</div>';
             }
         }
 
         // 網頁開啟時立刻執行一次
         fetchWarnings();
         
-        // 設定每 5 分鐘 (300000 毫秒) 自動重新載入一次最新資訊
+        // 設定每 5 分鐘自動重新載入一次最新資訊
         setInterval(fetchWarnings, 300000);
     </script>
 </body>
